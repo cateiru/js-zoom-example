@@ -16,6 +16,10 @@ body {
     border: 2px solid black;
 }
 
+.zoom-content {
+    /* transform: translate3d(200px, 10px, 0px) scale(1.5); */
+}
+
 .view {
     vertical-align:top;
 }

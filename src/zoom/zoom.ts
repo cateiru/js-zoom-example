@@ -2,17 +2,46 @@ import { AbstractEvent } from "./config";
 
 export class Zoom implements AbstractEvent {
   private targetElement: HTMLElement;
+  private zoomElement?: HTMLElement;
   private previewMode: boolean;
+  private previewCenterElement?: HTMLElement;
 
   private pointerEvents: PointerEvent[];
   private previousDiff: number;
+  private scale: number;
+  private dx: number;
+  private dy: number;
+  private maxDx: number;
+  private maxDy: number;
 
   constructor(targetElement: HTMLElement, previewMode: boolean) {
     this.targetElement = targetElement;
+    this.zoomElement =
+      this.targetElement.querySelector<HTMLElement>(".js-zoom") ?? undefined;
     this.previewMode = previewMode;
 
     this.pointerEvents = [];
     this.previousDiff = -1;
+    this.scale = 1;
+
+    this.dx = 0;
+    this.dy = 0;
+
+    this.maxDx = -1;
+    this.maxDy = -1;
+
+    // プレビュー用表示設定
+    if (this.previewMode && this.zoomElement) {
+      this.zoomElement.style.border = "2px solid green";
+    }
+    if (this.previewMode) {
+      this.previewCenterElement = document.createElement("div");
+      this.previewCenterElement.style.position = "absolute";
+      this.previewCenterElement.style.width = "10px";
+      this.previewCenterElement.style.height = "10px";
+      this.previewCenterElement.style.backgroundColor = "yellow";
+      document.body.appendChild(this.previewCenterElement);
+    }
 
     this.initEvents();
   }
@@ -56,15 +85,44 @@ export class Zoom implements AbstractEvent {
       );
 
       if (this.previousDiff > 0) {
-        // zoom in
-        if (currentDiff > this.previousDiff) {
-          if (this.previewMode)
-            this.targetElement.style.backgroundColor = "red";
+        const pinchCenterX =
+          (this.pointerEvents[0].clientX + this.pointerEvents[1].clientX) / 2;
+        const pinchCenterY =
+          (this.pointerEvents[0].clientY + this.pointerEvents[1].clientY) / 2;
+
+        if (this.maxDx === -1 && this.maxDy === -1) {
+          this.maxDx = pinchCenterX;
+          this.maxDy = pinchCenterY;
         }
-        // zoom out
-        else if (currentDiff < this.previousDiff) {
-          if (this.previewMode)
+
+        // pinchCenter を表示する
+        if (this.previewMode && this.previewCenterElement) {
+          this.previewCenterElement.style.left = `${pinchCenterX}px`;
+          this.previewCenterElement.style.top = `${pinchCenterY}px`;
+        }
+
+        this.dx = pinchCenterX * this.scale;
+        this.dy = pinchCenterY * this.scale;
+
+        // スケール計算
+        const zoomMagnification = currentDiff / this.previousDiff;
+        this.scale = Math.max(this.scale * zoomMagnification, 0.7);
+
+        // css 反映
+        if (this.zoomElement) {
+          this.zoomElement.style.transition = "transform 0s";
+          this.zoomElement.style.transform = `translate3d(${this.dx}px, ${this.dy}px, 0px) scale(${this.scale})`;
+        }
+
+        // プレビュー用
+        if (this.previewMode) {
+          if (currentDiff > this.previousDiff) {
+            this.targetElement.style.backgroundColor = "red";
+          }
+          // zoom out
+          else if (currentDiff < this.previousDiff) {
             this.targetElement.style.backgroundColor = "blue";
+          }
         }
       }
 
@@ -82,21 +140,47 @@ export class Zoom implements AbstractEvent {
     this.previousDiff = -1;
 
     if (this.previewMode) this.targetElement.style.backgroundColor = "";
+
+    this.resetScale();
+  }
+
+  /**
+   * スケールが1より小さい場合、1にリセットする
+   * アニメーション付き
+   */
+  private resetScale() {
+    if (this.scale < 1) {
+      this.scale = 1;
+
+      this.dx = 0;
+      this.dy = 0;
+
+      this.maxDx = -1;
+      this.maxDy = -1;
+
+      if (this.zoomElement) {
+        this.zoomElement.style.transform = `scale(${this.scale})`;
+        this.zoomElement.style.transition = "transform 0.3s";
+      }
+    }
   }
 
   /**
    * 後処理
    */
   public destroy() {
-    try {
-      this.targetElement.removeEventListener("pointerdown", this.pointerDown);
-      this.targetElement.removeEventListener("pointermove", this.pointerMove);
-      this.targetElement.removeEventListener("pointerup", this.pointerUp);
-      this.targetElement.removeEventListener("pointercancel", this.pointerUp);
-      this.targetElement.removeEventListener("pointerout", this.pointerUp);
-      this.targetElement.removeEventListener("pointerleave", this.pointerUp);
-    } catch (e) {
-      alert(e);
+    this.targetElement.removeEventListener("pointerdown", this.pointerDown);
+    this.targetElement.removeEventListener("pointermove", this.pointerMove);
+    this.targetElement.removeEventListener("pointerup", this.pointerUp);
+    this.targetElement.removeEventListener("pointercancel", this.pointerUp);
+    this.targetElement.removeEventListener("pointerout", this.pointerUp);
+    this.targetElement.removeEventListener("pointerleave", this.pointerUp);
+
+    if (this.previewMode) {
+      if (this.previewCenterElement)
+        document.body.removeChild(this.previewCenterElement);
+
+      if (this.zoomElement) this.zoomElement.style.border = "";
     }
   }
 }

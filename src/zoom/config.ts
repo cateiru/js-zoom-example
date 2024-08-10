@@ -21,7 +21,7 @@ export function configEvent(
   const configElement = document.querySelector<HTMLElement>(".js-config");
   if (configElement == null) return;
 
-  addEventListener("change", async () => {
+  const event = async () => {
     // 後処理
     EVENTS.forEach((e) => e.destroy());
     EVENTS.splice(0);
@@ -31,7 +31,10 @@ export function configEvent(
     if (e != null) {
       EVENTS.push(e);
     }
-  });
+  };
+
+  addEventListener("change", event);
+  event();
 }
 
 /**
