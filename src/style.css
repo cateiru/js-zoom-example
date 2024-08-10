@@ -1,3 +1,21 @@
 body {
-    background-color: red;
+    background-color: gray;
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+    width: 100%;
+}
+
+.content-item {
+    background-color: white;
+    border: 2px solid black;
+}
+
+.view {
+    vertical-align:top;
 }

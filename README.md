@@ -14,6 +14,10 @@ pnpm dev
 pnpm build
 ```
 
+## COPYRIGHT OF IMAGES USED
+
+- [manga_genkou.png](./public/manga_genkou.png) is from [いらすとや](https://www.irasutoya.com)
+
 ## LICENSE
 
 [MIT](./LICENSE)
