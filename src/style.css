@@ -11,15 +11,22 @@ body {
     width: 100%;
 }
 
+.info {
+    display: flex;
+    align-items: center;
+}
+
+.info > div {
+    margin: 0 10px;
+}
+
 .content-item {
     background-color: white;
     border: 2px solid black;
 }
 
-.zoom-content {
-    /* transform: translate3d(200px, 10px, 0px) scale(1.5); */
-}
 
 .view {
     vertical-align:top;
+    width: 100%;
 }

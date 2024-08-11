@@ -14,4 +14,14 @@ export function disableBrowserZoom(targetElement: HTMLElement) {
     },
     { passive: false }
   );
+
+  // タッチ操作でのスクロールを無効化する
+  // ズームしないときはスクロールされてほしいので Zoom クラス内で行う
+  // targetElement.addEventListener(
+  //   "touchmove",
+  //   (event) => {
+  //     event.preventDefault();
+  //   },
+  //   { passive: false }
+  // );
 }

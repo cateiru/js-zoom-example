@@ -8,18 +8,25 @@
     <script type="module" src="/src/main.ts" defer></script>
   </head>
   <body>
-    <div class="config js-config">
-        <label for="show-preview">
-            <input type="checkbox" class="js-show-preview" id="show-preview" />
-            Show preview
-        </label>
-    </div>
+
     <div class="content-wrapper">
-        <div class="content-item">
-            <div class="zoom-content js-zoom">
-                <canvas class="js-view view" width="800" height="709"></canvas>
+        <div>
+            <div class="info">
+                <p>ズーム倍率:<span class="js-scale"></span></p>
+                <div class="config js-config">
+                    <label for="show-preview">
+                        <input type="checkbox" class="js-show-preview" id="show-preview" />
+                        Show preview
+                    </label>
+                </div>
+            </div>
+            <div class="content-item">
+                <div class="zoom-content js-zoom">
+                    <canvas class="js-view view" width="800" height="709"></canvas>
+                </div>
             </div>
         </div>
     </div>
+    <ul class="preview-log js-preview-log"></ul>
   </body>
 </html>
